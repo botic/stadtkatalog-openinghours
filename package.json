@@ -1,0 +1,32 @@
+{
+    "name": "@stadtkatalog/openinghours",
+    "version": "0.1.0",
+    "description": "StadtKatalog opening hours library",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://gitlab.com/stadtkatalog/openinghours.git"
+    },
+    "keywords": [
+        "stadtkatalog",
+        "opendata",
+        "openinghours",
+        "business hours"
+    ],
+    "author": "Philipp Naderer-Puiu <stadtkatalog@naderer-puiu.at>",
+    "license": "AGPL-3.0-or-later",
+    "bugs": {
+        "url": "https://gitlab.com/stadtkatalog/openinghours/issues"
+    },
+    "homepage": "https://gitlab.com/stadtkatalog/openinghours/",
+    "devDependencies": {
+        "jest": "^23.1.0"
+    },
+    "dependencies": {
+        "luxon": "^1.3.3",
+        "pegjs": "^0.10.0"
+    }
+}
