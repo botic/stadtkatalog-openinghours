@@ -1,10 +1,11 @@
-const OpeningHours = require("../../lib/openinghours");
+const OpeningHours = require("../../src/lib/openinghours");
 
 test("test previous day is overlong", () => {
     let bh = new OpeningHours({ fri: ["10:00", "28:00"] }, "UTC");
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 9)))).toBe(null);
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 10)))).toBe("fri");
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 11)))).toBe(null);
+    expect(bh.hours.fri).toHaveLength(2);
 });
 
 test("test previous day is overlong with multiple ranges", () => {
@@ -12,6 +13,7 @@ test("test previous day is overlong with multiple ranges", () => {
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 9)))).toBe(null);
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 10)))).toBe("fri");
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 11)))).toBe(null);
+    expect(bh.hours.fri).toHaveLength(4);
 });
 
 test("test 24/7", () => {
@@ -19,6 +21,7 @@ test("test 24/7", () => {
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 9)))).toBe(null);
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 10)))).toBe("fri");
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 11)))).toBe(null);
+    expect(bh.hours.fri).toHaveLength(2);
 });
 
 test("test preceding is holiday", () => {
@@ -26,6 +29,7 @@ test("test preceding is holiday", () => {
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 9)))).toBe(null);
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 10)))).toBe("hol");
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 11)))).toBe(null);
+    expect(bh.hours.fri).toHaveLength(2);
 });
 
 test("test preceding closed", () => {
@@ -33,6 +37,7 @@ test("test preceding closed", () => {
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 9)))).toBe(null);
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 10)))).toBe(null);
     expect(bh.getOverlongPrecedingWeekdayKey(new Date(Date.UTC(2016, 8, 11)))).toBe(null);
+    expect(bh.hours.fri).toHaveLength(0);
 });
 
 test("test preceding undefined", () => {

@@ -16,6 +16,8 @@ const WEEKDAY_INDEX_TO_KEY = [
 ];
 
 function foldWeekday(rawDay) {
+    /* this is just a guard for the parser */
+    /* istanbul ignore if */
     if (rawDay.some(subDay => subDay.length !== 4)) {
         throw new Error(`Invalid length of sub day, must be 4, but is ${rawDay}`);
     }
@@ -44,10 +46,14 @@ module.exports = (str) => {
     const parsedResult = parser.parse(parserStr);
 
     for (let dayExpression of parsedResult) {
+        /* this is just a guard for the parser */
+        /* istanbul ignore if */
         if (dayExpression[0].length > 1) {
             throw new Error(`Invalid dayExpression day with length ${dayExpression[0].length}`);
         }
 
+        /* this is just a guard for the parser */
+        /* istanbul ignore if */
         if (dayExpression[1].length === 0) {
             throw new Error(`Invalid dayExpression times with length ${dayExpression[1].length}`);
         }

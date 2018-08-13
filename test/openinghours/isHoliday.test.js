@@ -1,4 +1,4 @@
-const OpeningHours = require("../../lib/openinghours");
+const OpeningHours = require("../../src/lib/openinghours");
 
 test("test date is on a holiday", () => {
     let bh = new OpeningHours({ fri: ["10:00", "20:00"] }, "UTC", ["2016-09-09"]);
@@ -7,6 +7,7 @@ test("test date is on a holiday", () => {
     expect(bh.isHoliday("2016-09-09")).toBe(true);
     bh = new OpeningHours({ fri: ["10:00", "20:00"] }, "UTC", ["2000-10-10", "2016-09-09", "2020-11-11"]);
     expect(bh.isHoliday("2016-09-09")).toBe(true);
+    expect(bh.hours.fri).toHaveLength(2);
 });
 
 test("test date is not a holiday", () => {
@@ -18,4 +19,5 @@ test("test date is not a holiday", () => {
     expect(bh.isHoliday("2016-09-09")).toBe(false);
     bh = new OpeningHours({ fri: ["10:00", "20:00"] }, "UTC", ["2017-09-09"]);
     expect(bh.isHoliday("2016-09-09")).toBe(false);
+    expect(bh.hours.fri).toHaveLength(2);
 });

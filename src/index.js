@@ -4,4 +4,4 @@
  * The OpeningHours data structure.
  * @type {OpeningHours}
  */
-exports.OpeningHours = require("./openinghours");
+exports.OpeningHours = require("./lib/openinghours");

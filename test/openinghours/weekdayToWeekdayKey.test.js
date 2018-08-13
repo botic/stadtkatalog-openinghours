@@ -1,4 +1,4 @@
-const OpeningHours = require("../../lib/openinghours");
+const OpeningHours = require("../../src/lib/openinghours");
 
 test("test all valid day numbers", () => {
     expect(OpeningHours.weekdayToWeekdayKey(1)).toBe("mon");
