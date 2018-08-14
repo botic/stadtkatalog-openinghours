@@ -139,7 +139,7 @@ class OpeningHours {
 
     /**
      * Checks if the instance is open at the given date.
-     * @param date {Date} JavaScript date instance
+     * @param date {Object} JavaScript Date instance
      * @returns {boolean} true if the instance is open, false otherwise
      */
     isOpenAt(date) {
