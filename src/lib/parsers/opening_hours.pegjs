@@ -45,45 +45,49 @@ forward_day_expression = (!day_phrase .)* day_phrase:day_phrase time_range:time_
 day_phrase = day_list / day_range / single_day / weekday / weekend
 
 day_list = day1:day (_ . _) day2:day (_ . _) day3:day days:((_ . _) day)+
-    {
-        return flatten([day1, day2, day3], days)
-    }
+{
+    return flatten([day1, day2, day3], days)
+}
 
-weekday = 'weekday' / 'wochentags' {
+weekday = 'weekday' / 'wochentags'
+{
     return [1, 2, 3, 4, 5]
 }
 
-weekend = 'weekend' / 'wochenende' {
+weekend = 'weekend' / 'wochenende'
+{
     return [0, 6]
 }
 
-single_day = day:day {
+single_day = day:day
+{
     return [day]
 }
 
 day_range = day1:day time_separator day2:day and_clause:((_ '&' _) day)?
-    {
-        //add days
-        var contiguous = day2 >= day1
-        var days = []
-        if (contiguous) {
-            for (var day = day1; day <= day2; day++) {
-                days.push(day)
-            }
-        } else {
-            for (var day = day1; day <= 6; day++) {
-    days.push(day)
+{
+    //add days
+    var contiguous = day2 >= day1
+    var days = []
+    if (contiguous) {
+        for (var day = day1; day <= day2; day++) {
+            days.push(day)
+        }
+    } else {
+        for (var day = day1; day <= 6; day++) {
+            days.push(day)
+        }
+        for (var day = 0; day <= day2; day++) {
+            days.push(day)
+        }
+    }
+    var extra_day = safe_get(and_clause, 1)
+    if (extra_day || extra_day == 0) {
+        days.push(extra_day)
+    }
+    return days
 }
-for (var day = 0; day <= day2; day++) {
-    days.push(day)
-}
-}
-var extra_day = safe_get(and_clause, 1)
-if (extra_day || extra_day == 0) {
-    days.push(extra_day)
-}
-return days
-}
+
 day =
     sunday / monday / tuesday / wednesday / thursday / friday / saturday / public_holiday /
     montag / dienstag / mittwoch / donnerstag / freitag / samstag / sonntag / feiertag
@@ -133,7 +137,7 @@ time_separator = _ ('bis' / 'to' / .) _
 _ = [ \t\r\n]*
 __ = [ \t\r\n]+
 
-    time_phrase = time:long_time am_pm:am_pm
+time_phrase = time:long_time am_pm:am_pm
 {
     var hours = time[0]
     var mins = time[2]
@@ -141,6 +145,7 @@ __ = [ \t\r\n]+
 }
 
 long_time = hours colon minutes / four_digit_time
+
 four_digit_time = a:[0-9] b:[0-9] c:[0-9] d:[0-9]
 {
     return [parseInt(a + b, 10), '', parseInt(c + d, 10)]
