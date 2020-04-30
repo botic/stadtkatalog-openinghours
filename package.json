@@ -1,6 +1,6 @@
 {
     "name": "@stadtkatalog/openinghours",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "StadtKatalog opening hours library",
     "main": "src/index.js",
     "scripts": {

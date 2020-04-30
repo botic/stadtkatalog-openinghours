@@ -78,7 +78,7 @@ class OpeningHours {
         this.hours = hours;
         this.timeZone = timeZone;
         this.holidays = holidays || [];
-        this.specialDays = specialDays || Object.create(null);
+        this.specialDays = specialDays || {};
 
         // fixme: add checks that everything was in the right format
     }
