@@ -1,9 +1,5 @@
-"use strict";
-
-const {
-    DateTime,
-    Interval
-} = require("luxon");
+import {DateTime, Interval} from "luxon";
+import {IOpeningHours} from "./types";
 
 /**
  * Helper function to determine if a DateTime is inside the given time frame.
@@ -13,7 +9,7 @@ const {
  * @returns {boolean} true, if `ldt` is contained in the time frame; false otherwise
  * @private
  */
-function _isInTimeFrame(ldt, startFrame, endFrame) {
+function _isInTimeFrame(ldt: DateTime, startFrame: string, endFrame: string) {
     const startTime = startFrame.split(":").map(frame => Number.parseInt(frame, 10));
     const endTime = endFrame.split(":").map(frame => Number.parseInt(frame, 10));
 
@@ -23,17 +19,17 @@ function _isInTimeFrame(ldt, startFrame, endFrame) {
     return Interval.fromDateTimes(startDateTime, endDateTime).contains(ldt);
 }
 
-function _areOverlongTimeFrames(timeFrames) {
+function _areOverlongTimeFrames(timeFrames?: string[]) {
     // no opening hours defined
-    if (!Array.isArray(timeFrames)) {
+    if (!timeFrames) {
         return false;
     }
 
     // checks the trailing time frame to match a time string
-    return /^(2[4-9]|[34]\d):\d{2}$/.test(timeFrames.slice(-1));
+    return /^(2[4-9]|[34]\d):\d{2}$/.test(timeFrames.slice(-1)[0]);
 }
 
-function _getAdditionalStartOfDayTimeFrames(overlongTimeFrames) {
+function _getAdditionalStartOfDayTimeFrames(overlongTimeFrames: string[]) {
     const overflowingHours = overlongTimeFrames
         .slice(-1)[0]
         .split(":")
@@ -51,10 +47,30 @@ function _getAdditionalStartOfDayTimeFrames(overlongTimeFrames) {
 }
 
 /**
- * An OpeningHours instance is a data structure representing the opening hours of an entity. It provides methods to
- * check if the entity is open or closed at a given date time.
+ * Opening hours.
  */
-class OpeningHours {
+export class OpeningHours {
+    #_hours: IOpeningHours;
+    #_timezone: string;
+    #_holidays: string[];
+    #_specialDays: IOpeningHours;
+
+    get timezone(): string {
+        return this.#_timezone;
+    }
+
+    get specialDays(): IOpeningHours {
+        return this.#_specialDays;
+    }
+
+    get holidays(): string[] {
+        return this.#_holidays;
+    }
+
+    get hours(): IOpeningHours {
+        return this.#_hours;
+    }
+
     /**
      * Creates a new instance with the given opening hours in the specified time zone.
      * @param {Object} hours - contains the opening hours for each day. If a weekday key is not defined, the opening
@@ -69,16 +85,16 @@ class OpeningHours {
      * @param {string[]} hours.sat - the opening hours on Saturday
      * @param {string[]} hours.sun - the opening hours on Sunday
      * @param {string[]} hours.hol - the opening hours on a holiday
-     * @param {string} timeZone - the time zone of the entity
+     * @param {string} timezone - the time zone of the entity
      * @param {string[]} [holidays=[]] - set of holidays in the format `YYYY-MM-DD`
      * @param {Object} [specialDays={}] - table of days with special opening hours. The keys of this object
      *                                    must be in the form `YYYY-MM-DD`.
      */
-    constructor(hours, timeZone, holidays, specialDays) {
-        this.hours = hours;
-        this.timeZone = timeZone;
-        this.holidays = holidays || [];
-        this.specialDays = specialDays || {};
+    constructor(hours: IOpeningHours, timezone: string, holidays: string[] = [], specialDays: IOpeningHours = {}) {
+        this.#_hours = hours;
+        this.#_timezone = timezone;
+        this.#_holidays = holidays;
+        this.#_specialDays = specialDays;
 
         // fixme: add checks that everything was in the right format
     }
@@ -88,7 +104,7 @@ class OpeningHours {
      * @param weekday 1 is Monday and 7 is Sunday
      * @returns {string} three letter weekday key
      */
-    static weekdayToWeekdayKey(weekday) {
+    static weekdayToWeekdayKey(weekday: number) {
         switch(weekday) {
             case 1: return "mon";
             case 2: return "tue";
@@ -107,17 +123,17 @@ class OpeningHours {
      * @param dateStr the date in the format `YYYY-MM-DD`
      * @returns {boolean} `true` if holiday, `false` otherwise
      */
-    isSpecialDay(dateStr) {
-        return Object.keys(this.specialDays).indexOf(dateStr) >= 0;
+    isSpecialDay(dateStr: string) {
+        return Object.keys(this.#_specialDays).indexOf(dateStr) >= 0;
     }
 
     /**
-     * Checks if the given date string is on a holiday for the `OpeningHours` instance.
+     * Checks if the given date string is on a holiday for the `IOpeningHours` instance.
      * @param dateStr the date in the format `YYYY-MM-DD`
      * @returns {boolean} `true` if holiday, `false` otherwise
      */
-    isHoliday(dateStr) {
-        return this.holidays.indexOf(dateStr) >= 0;
+    isHoliday(dateStr: string) {
+        return this.#_holidays.indexOf(dateStr) >= 0;
     }
 
     /**
@@ -127,14 +143,14 @@ class OpeningHours {
      * @param date JavaScript date
      * @returns {string} the preceding three-letter weekday key; or `null` if no overlong preceding day found
      */
-    getOverlongPrecedingWeekdayKey(date) {
-        const ldt = DateTime.fromJSDate(date).setZone(this.timeZone);
+    getOverlongPrecedingWeekdayKey(date: Date) {
+        const ldt = DateTime.fromJSDate(date).setZone(this.#_timezone);
         const yesterday = ldt.plus({ days: -1 });
         const prevDayKey = this.isHoliday(yesterday.toFormat("yyyy-LL-dd"))
             ? "hol"
             : OpeningHours.weekdayToWeekdayKey(yesterday.weekday);
 
-        return _areOverlongTimeFrames(this.hours[prevDayKey]) ? prevDayKey : null;
+        return _areOverlongTimeFrames(this.#_hours[prevDayKey]) ? prevDayKey : null;
     }
 
     /**
@@ -142,24 +158,30 @@ class OpeningHours {
      * @param date {Object} JavaScript Date instance
      * @returns {boolean} true if the instance is open, false otherwise
      */
-    isOpenAt(date) {
-        const dayDT = DateTime.fromJSDate(date).setZone(this.timeZone);
+    isOpenAt(date: Date) {
+        const dayDT = DateTime.fromJSDate(date).setZone(this.#_timezone);
         const precedingDayDT = dayDT.plus({ days: -1 });
 
         const dayFormatStr = dayDT.toFormat("yyyy-LL-dd");
         const precedingDayFormatStr = precedingDayDT.toFormat("yyyy-LL-dd");
 
         const timeFrames = this.isSpecialDay(dayFormatStr)
-            ? this.specialDays[dayFormatStr].slice(0)
-            : (this.hours[OpeningHours.weekdayToWeekdayKey(dayDT.weekday)] || []).slice(0);
+            ? this.#_specialDays[dayFormatStr]?.slice(0) || []
+            : (this.#_hours[OpeningHours.weekdayToWeekdayKey(dayDT.weekday)] || []).slice(0);
 
         if (this.isSpecialDay(precedingDayFormatStr)) {
-            timeFrames.push(..._getAdditionalStartOfDayTimeFrames(this.specialDays[precedingDayFormatStr]));
+            const tfs = this.#_specialDays[precedingDayFormatStr];
+            if (tfs) {
+                timeFrames.push(..._getAdditionalStartOfDayTimeFrames(tfs));
+            }
         } else {
             // overflowing time frame detected, so add it to the set of time frames
             const precedingWeekdayKey = this.getOverlongPrecedingWeekdayKey(date);
             if (precedingWeekdayKey !== null) {
-                timeFrames.push(..._getAdditionalStartOfDayTimeFrames(this.hours[precedingWeekdayKey]));
+                const tfs = this.#_hours[precedingWeekdayKey];
+                if (tfs) {
+                    timeFrames.push(..._getAdditionalStartOfDayTimeFrames(tfs));
+                }
             }
         }
 
@@ -173,5 +195,3 @@ class OpeningHours {
         return false;
     }
 }
-
-module.exports = OpeningHours;

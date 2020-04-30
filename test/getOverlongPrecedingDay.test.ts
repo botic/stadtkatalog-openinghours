@@ -1,4 +1,4 @@
-const OpeningHours = require("../../src/lib/openinghours");
+import {OpeningHours} from "../src/openinghours";
 
 test("test previous day is overlong", () => {
     let bh = new OpeningHours({ fri: ["10:00", "28:00"] }, "UTC");

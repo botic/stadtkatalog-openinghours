@@ -1,5 +1,6 @@
-const fs = require("fs");
-const peg = require("pegjs");
+import * as fs from "fs";
+import * as peg from "pegjs";
+import {IOpeningHours} from "./types";
 
 const grammar = fs.readFileSync(`${__dirname}/parsers/opening_hours.pegjs`, { encoding: "utf8" });
 const parser = peg.generate(grammar);
@@ -13,11 +14,10 @@ const WEEKDAY_INDEX_TO_KEY = [
     "fri",
     "sat",
     "hol"
-];
+] as string[];
 
-function foldWeekday(rawDay) {
+function foldWeekday(rawDay: number[][]): string[] {
     /* this is just a guard for the parser */
-    /* istanbul ignore if */
     if (rawDay.some(subDay => subDay.length !== 4)) {
         throw new Error(`Invalid length of sub day, must be 4, but is ${rawDay}`);
     }
@@ -33,27 +33,29 @@ function foldWeekday(rawDay) {
             }
 
             return acc;
-        }, []);
+        }, [] as string[]);
 }
 
-module.exports = (str) => {
+/**
+ * Parses the given string and returns an opening hours object.
+ * @param str opening hours in a human readable format
+ */
+export function parseHours(str: string): IOpeningHours {
     let parserStr = str
         .toLowerCase()
         .replace(/ +/, " ")
         .trim();
 
-    const res = Object.create(null);
+    const res = {} as IOpeningHours;
     const parsedResult = parser.parse(parserStr);
 
     for (let dayExpression of parsedResult) {
         /* this is just a guard for the parser */
-        /* istanbul ignore if */
         if (dayExpression[0].length > 1) {
             throw new Error(`Invalid dayExpression day with length ${dayExpression[0].length}`);
         }
 
         /* this is just a guard for the parser */
-        /* istanbul ignore if */
         if (dayExpression[1].length === 0) {
             throw new Error(`Invalid dayExpression times with length ${dayExpression[1].length}`);
         }
@@ -63,4 +65,4 @@ module.exports = (str) => {
     }
 
     return res;
-};
+}

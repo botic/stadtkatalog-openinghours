@@ -1,4 +1,4 @@
-const OpeningHours = require("../../src/lib/openinghours");
+import {OpeningHours} from "../src/openinghours";
 
 test("test simple day", () => {
     const bh = new OpeningHours({ fri: ["10:00", "20:00"] }, "UTC");
@@ -61,7 +61,7 @@ test("test day with preceding overlong special hours", () => {
     expect(bh.holidays).toHaveLength(0);
     expect(bh.specialDays["2016-09-08"]).toHaveLength(2);
     expect(bh.specialDays["2016-09-09"]).toBeUndefined();
-    expect(bh.timeZone).toBe("UTC");
+    expect(bh.timezone).toBe("UTC");
 });
 
 

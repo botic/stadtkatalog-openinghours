@@ -1,4 +1,4 @@
-const parseHours = require("../src/lib/parser");
+import {parseHours} from "../src/parser";
 
 test("test simple opening hour string with range over weekdays", () => {
     expect(

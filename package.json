@@ -1,44 +1,48 @@
 {
-    "name": "@stadtkatalog/openinghours",
-    "version": "0.2.0",
-    "description": "StadtKatalog opening hours library",
-    "main": "src/index.js",
-    "scripts": {
-        "test": "jest"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://gitlab.com/stadtkatalog/openinghours.git"
-    },
-    "keywords": [
-        "stadtkatalog",
-        "opendata",
-        "openinghours",
-        "business hours"
-    ],
-    "author": "Philipp Naderer-Puiu <stadtkatalog@naderer-puiu.at>",
-    "contributors": [],
-    "license": "ISC",
-    "bugs": {
-        "url": "https://gitlab.com/stadtkatalog/openinghours/issues"
-    },
-    "homepage": "https://gitlab.com/stadtkatalog/openinghours/",
-    "devDependencies": {
-        "esdoc": "^1.1.0",
-        "esdoc-node": "^1.0.3",
-        "esdoc-standard-plugin": "^1.0.0",
-        "jest": "^23.1.0"
-    },
-    "dependencies": {
-        "luxon": "^1.3.3",
-        "pegjs": "^0.10.0"
-    },
-    "files": [
-        "LICENSE",
-        "README.md",
-        "src/"
-    ],
-    "engines": {
-        "node": ">= 8.9.0"
-    }
+  "name": "@stadtkatalog/openinghours",
+  "version": "1.0.0",
+  "description": "StadtKatalog opening hours library",
+  "main": "lib/openinghours.js",
+  "types": "lib/openinghours.d.ts",
+  "engines": {
+    "node": ">=12.13.0"
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "test": "jest",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/stadtkatalog/openinghours.git"
+  },
+  "keywords": [
+    "stadtkatalog",
+    "opendata",
+    "openinghours",
+    "business hours"
+  ],
+  "author": "Philipp Naderer-Puiu",
+  "contributors": [],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/stadtkatalog/openinghours/issues"
+  },
+  "homepage": "https://gitlab.com/stadtkatalog/openinghours/",
+  "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "@types/luxon": "^1.22.0",
+    "@types/node": "^13.13.4",
+    "@types/pegjs": "^0.10.1",
+    "jest": "^25.4.0",
+    "ts-jest": "^25.4.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "luxon": "^1.23.0",
+    "pegjs": "^0.10.0"
+  },
+  "files": [
+    "lib/"
+  ]
 }

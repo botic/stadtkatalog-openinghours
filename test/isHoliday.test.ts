@@ -1,4 +1,4 @@
-const OpeningHours = require("../../src/lib/openinghours");
+import {OpeningHours} from "../src/openinghours";
 
 test("test date is on a holiday", () => {
     let bh = new OpeningHours({ fri: ["10:00", "20:00"] }, "UTC", ["2016-09-09"]);
