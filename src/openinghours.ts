@@ -1,50 +1,13 @@
-import {DateTime, Interval} from "luxon";
-import {IOpeningHours} from "./types";
+import {DateTime} from "luxon";
+import {FormatOptions, IOpeningHours, WeekdayFormat} from "./types";
+import {
+    _areOverlongTimeFrames, _canFoldIntoDayRange,
+    _createRangeBag,
+    _eliminateEqualRanges, _formatTimeFrames,
+    _getAdditionalStartOfDayTimeFrames, _isInTimeFrame, WEEKDAY_KEYS
+} from "./helpers";
 
-/**
- * Helper function to determine if a DateTime is inside the given time frame.
- * @param ldt the DateTime object to check
- * @param startFrame {string} start of the time frame in the format "hh:mm"
- * @param endFrame {string} end of the time frame in the format "hh:mm"
- * @returns {boolean} true, if `ldt` is contained in the time frame; false otherwise
- * @private
- */
-function _isInTimeFrame(ldt: DateTime, startFrame: string, endFrame: string) {
-    const startTime = startFrame.split(":").map(frame => Number.parseInt(frame, 10));
-    const endTime = endFrame.split(":").map(frame => Number.parseInt(frame, 10));
-
-    const startDateTime = ldt.set({ hour: startTime[0], minute: startTime[1], second: 0, millisecond: 0 });
-    const endDateTime = ldt.set({ hour: endTime[0], minute: endTime[1], second: 0, millisecond: 0 });
-
-    return Interval.fromDateTimes(startDateTime, endDateTime).contains(ldt);
-}
-
-function _areOverlongTimeFrames(timeFrames?: string[]) {
-    // no opening hours defined
-    if (!timeFrames) {
-        return false;
-    }
-
-    // checks the trailing time frame to match a time string
-    return /^(2[4-9]|[34]\d):\d{2}$/.test(timeFrames.slice(-1)[0]);
-}
-
-function _getAdditionalStartOfDayTimeFrames(overlongTimeFrames: string[]) {
-    const overflowingHours = overlongTimeFrames
-        .slice(-1)[0]
-        .split(":")
-        .map(part => Number.parseInt(part, 10));
-
-    // "24:00" has no effect on our current calculation, so only consider overflowing hours
-    if (overflowingHours[0] > 24 || (overflowingHours[0] === 24 && overflowingHours[1] > 0)) {
-        return[
-            "00:00",
-            `${overflowingHours[0] - 24}`.padStart(2, "0") + ":" + `${overflowingHours[1]}`.padStart(2, "0")
-        ];
-    }
-
-    return [];
-}
+const DEFAULT_LOCALE = Intl.DateTimeFormat().resolvedOptions().locale;
 
 /**
  * Opening hours.
@@ -193,5 +156,83 @@ export class OpeningHours {
         }
 
         return false;
+    }
+
+    /**
+     * Folds the opening hours into a human readable string.
+     *
+     * @param formatOptions formatting options with the following options:
+     *         - `hyphen` (default ` – `) divider between generated time ranges, e.g. the hypen in `10:00 – 12:00`
+     *         - `delimiter` (default `, `) delimiter between two time ranges, e.g. the comma in `10:00 – 12:00, 14:30 – 20:00`
+     *         - `locale` the locale is used when formatting the name of the day, requires an installed ICU or browser support
+     *         - `weekdayFormat` (default `short`) format for the representation of a weekday, defaults to the short format
+     *
+     * @see https://moment.github.io/luxon/docs/manual/intl.html
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
+     */
+    fold(formatOptions: FormatOptions = {}) {
+        const {
+            hyphen,
+            delimiter,
+            locale,
+            weekdayFormat,
+        } = Object.assign({}, {
+            hyphen: "\u202F\u2013\u202F",
+            delimiter: ", ",
+            locale: DEFAULT_LOCALE,
+            weekdayFormat: WeekdayFormat.short,
+        }, formatOptions) as FormatOptions;
+
+        const reducedTimeRange = _eliminateEqualRanges(this.#_hours);
+        const someMonday = DateTime
+            .utc(2020, 5, 4)
+            .setLocale(locale ?? DEFAULT_LOCALE);
+
+        const shortWeekdays = [
+            someMonday.toLocaleString({ weekday: weekdayFormat }),
+            someMonday.plus({ days: 1 }).toLocaleString({ weekday: weekdayFormat }),
+            someMonday.plus({ days: 2 }).toLocaleString({ weekday: weekdayFormat }),
+            someMonday.plus({ days: 3 }).toLocaleString({ weekday: weekdayFormat }),
+            someMonday.plus({ days: 4 }).toLocaleString({ weekday: weekdayFormat }),
+            someMonday.plus({ days: 5 }).toLocaleString({ weekday: weekdayFormat }),
+            someMonday.plus({ days: 6 }).toLocaleString({ weekday: weekdayFormat }),
+        ];
+
+        const rangeStrings = [] as { days: string; timeFrames: string[] }[];
+
+        const rangeBag = _createRangeBag(reducedTimeRange);
+        Object.keys(rangeBag).sort().map(numStr => {
+            const rangeNumber = Number(numStr);
+            const bagOfDays = rangeBag[rangeNumber];
+
+            if (_canFoldIntoDayRange(bagOfDays) && bagOfDays.length > 1) {
+                rangeStrings.push({
+                    days: shortWeekdays[bagOfDays[0]] + hyphen + shortWeekdays[bagOfDays.slice(-1)[0]],
+                    timeFrames: this.#_hours[WEEKDAY_KEYS[rangeNumber]] || []
+                });
+            } else {
+                rangeStrings.push({
+                    days: bagOfDays.map(function(dayIndex) {
+                        return shortWeekdays[dayIndex];
+                    }).join(delimiter),
+                    timeFrames: this.#_hours[WEEKDAY_KEYS[rangeNumber]] || []
+                });
+            }
+        });
+
+        return rangeStrings
+            .filter(foldedDayRange => foldedDayRange.timeFrames.length > 0)
+            .map(foldedDayRange => {
+                return foldedDayRange.days + ": " +
+                    _formatTimeFrames(
+                        foldedDayRange.timeFrames,
+                        "{start} bis {end} Uhr",
+                        " und ",
+                    )
+            }).join("\n") +  (
+            Array.isArray(this.#_hours.hol) && this.#_hours.hol.length > 0
+                    ? "\nFeiertags: " + _formatTimeFrames(this.#_hours.hol, "{start} bis {end} Uhr", " und ")
+                    : ""
+            );
     }
 }
