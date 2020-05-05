@@ -142,7 +142,7 @@ Stores opening hours and provides methods to work with them.
 
 ####  constructor
 
-\+ **new OpeningHours**(`hours`: [IOpeningHours](./docs/interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[], `specialDays`: [IOpeningHours](./docs/interfaces/_types_.iopeninghours.md)): *[OpeningHours](_openinghours_.openinghours.md)*
+\+ **new OpeningHours**(`hours`: [IOpeningHours](./doc/interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[], `specialDays`: [IOpeningHours](./doc/interfaces/_types_.iopeninghours.md)): *[OpeningHours](_openinghours_.openinghours.md)*
 
 Creates a new instance with the given opening hours in the specified time zone.
 
@@ -150,10 +150,10 @@ Creates a new instance with the given opening hours in the specified time zone.
 
 Name | Type | Default | Description |
 ------ | ------ | ------ | ------ |
-`hours` | [IOpeningHours](./docs/interfaces/_types_.iopeninghours.md) | - | contains the opening hours for each day. If a weekday key is not defined, the opening        hours on this particular day are unknown. If a weekday key references an empty array `[]`,        the entity is closed on this day. In all other cases a weekday key references an array        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`. |
+`hours` | [IOpeningHours](./doc/interfaces/_types_.iopeninghours.md) | - | contains the opening hours for each day. If a weekday key is not defined, the opening        hours on this particular day are unknown. If a weekday key references an empty array `[]`,        the entity is closed on this day. In all other cases a weekday key references an array        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`. |
 `timezone` | string | - | the time zone of the entity |
 `holidays` | string[] | [] | - |
-`specialDays` | [IOpeningHours](./docs/interfaces/_types_.iopeninghours.md) | {} | - |
+`specialDays` | [IOpeningHours](./doc/interfaces/_types_.iopeninghours.md) | {} | - |
 
 **Returns:** *[OpeningHours](_openinghours_.openinghours.md)*
 
@@ -169,17 +169,17 @@ ___
 
 ####  hours
 
-• **get hours**(): *[IOpeningHours](./docs/interfaces/_types_.iopeninghours.md)*
+• **get hours**(): *[IOpeningHours](./doc/interfaces/_types_.iopeninghours.md)*
 
-**Returns:** *[IOpeningHours](./docs/interfaces/_types_.iopeninghours.md)*
+**Returns:** *[IOpeningHours](./doc/interfaces/_types_.iopeninghours.md)*
 
 ___
 
 ####  specialDays
 
-• **get specialDays**(): *[IOpeningHours](./docs/interfaces/_types_.iopeninghours.md)*
+• **get specialDays**(): *[IOpeningHours](./doc/interfaces/_types_.iopeninghours.md)*
 
-**Returns:** *[IOpeningHours](./docs/interfaces/_types_.iopeninghours.md)*
+**Returns:** *[IOpeningHours](./doc/interfaces/_types_.iopeninghours.md)*
 
 ___
 
@@ -193,7 +193,7 @@ ___
 
 ####  fold
 
-▸ **fold**(`formatOptions`: [FormatOptions](./docs/interfaces/_types_.formatoptions.md)): *string*
+▸ **fold**(`formatOptions`: [FormatOptions](./doc/interfaces/_types_.formatoptions.md)): *string*
 
 Folds the opening hours into a human readable string.
 
@@ -205,7 +205,7 @@ Folds the opening hours into a human readable string.
 
 Name | Type | Default | Description |
 ------ | ------ | ------ | ------ |
-`formatOptions` | [FormatOptions](./docs/interfaces/_types_.formatoptions.md) | {} | formatting options. |
+`formatOptions` | [FormatOptions](./doc/interfaces/_types_.formatoptions.md) | {} | formatting options. |
 
 **Returns:** *string*
 
