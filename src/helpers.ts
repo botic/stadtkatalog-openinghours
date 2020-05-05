@@ -132,7 +132,7 @@ export function _eliminateEqualRanges(week: IOpeningHours) {
     }
 
     return dedupedRanges;
-};
+}
 
 export function _canFoldIntoDayRange(range: number[]) {
     return range.every((dayNumber: number, idx: number, arr: number[]) => {
@@ -140,15 +140,21 @@ export function _canFoldIntoDayRange(range: number[]) {
     })
 }
 
-export function _formatTimeFrames(hours: string[], format: string, delimiter: string, placeholder: string = "Geschlossen") {
+export function _formatTimeFrames(hours: string[], format: string, delimiter: string, placeholder: string) {
     if (hours.length === 0) {
         return placeholder || "";
     }
 
     const frameStr = [];
     for (let i = 0; i < hours.length; i += 2) {
+        const endTime = hours[i + 1].split(":").map(str => Number.parseInt(str, 10));
+        if (endTime[0] > 24 || (endTime[0] === 24 && endTime[1] > 0)) {
+            endTime[0] = endTime[0] - 24;
+        }
         frameStr.push(
-            format.replace("{start}", hours[i]).replace("{end}", hours[i + 1] || "max. 24:00")
+            format
+                .replace("{start}", hours[i])
+                .replace("{end}", `${String(endTime[0]).padStart(2, "0")}:${String(endTime[1]).padStart(2, "0")}`)
         );
     }
 

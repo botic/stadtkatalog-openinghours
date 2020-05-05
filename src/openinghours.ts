@@ -186,11 +186,19 @@ export class OpeningHours {
             delimiter,
             locale,
             weekdayFormat,
+            holidayPrefix,
+            timeFrameFormat,
+            timeFrameDelimiter,
+            closedPlaceholder,
         } = Object.assign({}, {
             hyphen: "\u202F\u2013\u202F",
             delimiter: ", ",
             locale: DEFAULT_LOCALE,
             weekdayFormat: WeekdayFormat.short,
+            holidayPrefix: "Holidays",
+            timeFrameFormat: "{start} to {end}",
+            timeFrameDelimiter: " and ",
+            closedPlaceholder: "Closed"
         }, formatOptions) as FormatOptions;
 
         const reducedTimeRange = _eliminateEqualRanges(this.#_hours);
@@ -236,12 +244,20 @@ export class OpeningHours {
                 return foldedDayRange.days + ": " +
                     _formatTimeFrames(
                         foldedDayRange.timeFrames,
-                        "{start} bis {end} Uhr",
-                        " und ",
+                        // @ts-ignore
+                        timeFrameFormat,
+                        timeFrameDelimiter,
+                        closedPlaceholder,
                     )
             }).join("\n") +  (
             Array.isArray(this.#_hours.hol) && this.#_hours.hol.length > 0
-                    ? "\nFeiertags: " + _formatTimeFrames(this.#_hours.hol, "{start} bis {end} Uhr", " und ")
+                    ? `\n${holidayPrefix}: ${_formatTimeFrames(
+                        this.#_hours.hol,
+                        // @ts-ignore
+                        timeFrameFormat,
+                        timeFrameDelimiter,
+                        closedPlaceholder,
+                    )}`
                     : ""
             );
     }

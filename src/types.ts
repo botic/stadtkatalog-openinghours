@@ -102,4 +102,24 @@ export interface FormatOptions {
      * format for the representation of a weekday, default `"short"`
      */
     weekdayFormat?: WeekdayFormat;
+
+    /**
+     * Prefix for holiday opening hours, default `"Holidays"`
+     */
+    holidayPrefix?: string;
+
+    /**
+     * Format string for time frames, default `"{start} to {end}"`
+     */
+    timeFrameFormat?: string;
+
+    /**
+     * Delimiter between multiple time frames, default `" and "`
+     */
+    timeFrameDelimiter?: string;
+
+    /**
+     * Placeholder if empty time frames = closed.
+     */
+    closedPlaceholder?: string;
 }
