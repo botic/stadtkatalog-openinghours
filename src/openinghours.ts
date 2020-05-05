@@ -129,7 +129,8 @@ export class OpeningHours {
         const precedingDayFormatStr = precedingDayDT.toFormat("yyyy-LL-dd");
 
         const timeFrames = this.isSpecialDay(dayFormatStr)
-            ? this.#_specialDays[dayFormatStr]?.slice(0) || []
+            // @ts-ignore slice(0) can never fail since its checked before
+            ? this.#_specialDays[dayFormatStr].slice(0)
             : (this.#_hours[OpeningHours.weekdayToWeekdayKey(dayDT.weekday)] || []).slice(0);
 
         if (this.isSpecialDay(precedingDayFormatStr)) {
