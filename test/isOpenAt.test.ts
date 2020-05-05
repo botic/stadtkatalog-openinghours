@@ -156,3 +156,10 @@ test("test day with short overlapping preceding one", () => {
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 9, 20, 0, 0, 0)))).toBe(false);
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 9, 20, 1, 0, 0)))).toBe(false);
 });
+
+test("empty opening hours / unknown hours", () => {
+    const bh = new OpeningHours({}, "UTC");
+
+    // the overlapping time frame
+    expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 9, 0, 0, 0, 0)))).toBe(false);
+})

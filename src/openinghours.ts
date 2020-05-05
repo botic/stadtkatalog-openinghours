@@ -131,6 +131,13 @@ export class OpeningHours {
     }
 
     /**
+     * Returns true if the opening hours represented by the instance are unknown.
+     */
+    isUnknown() {
+        return Object.keys(this.#_hours).length === 0 && Object.keys(this.#_specialDays).length === 0;
+    }
+
+    /**
      * Checks if the instance is open at the given date.
      * @param date {Object} JavaScript Date instance
      * @returns {boolean} true if the instance is open, false otherwise
