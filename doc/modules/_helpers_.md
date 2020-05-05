@@ -120,12 +120,12 @@ ___
 
 **Parameters:**
 
-Name | Type | Default |
------- | ------ | ------ |
-`hours` | string[] | - |
-`format` | string | - |
-`delimiter` | string | - |
-`placeholder` | string | "Geschlossen" |
+Name | Type |
+------ | ------ |
+`hours` | string[] |
+`format` | string |
+`delimiter` | string |
+`placeholder` | string |
 
 **Returns:** *string*
 
