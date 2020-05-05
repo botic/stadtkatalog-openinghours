@@ -1,21 +1,30 @@
 import {DateTime} from "luxon";
 import {FormatOptions, IOpeningHours, WeekdayFormat} from "./types";
 import {
-    _areOverlongTimeFrames, _canFoldIntoDayRange,
+    _areOverlongTimeFrames,
+    _canFoldIntoDayRange,
     _createRangeBag,
-    _eliminateEqualRanges, _formatTimeFrames,
-    _getAdditionalStartOfDayTimeFrames, _isInTimeFrame, WEEKDAY_KEYS
+    _eliminateEqualRanges,
+    _formatTimeFrames,
+    _getAdditionalStartOfDayTimeFrames,
+    _isInTimeFrame,
+    WEEKDAY_KEYS
 } from "./helpers";
 
 const DEFAULT_LOCALE = Intl.DateTimeFormat().resolvedOptions().locale;
 
 /**
- * Opening hours.
+ * Stores opening hours and provides methods to work with them.
+ * @see https://docs.stadtkatalog.org/
  */
 export class OpeningHours {
+    /** @ignore */
     #_hours: IOpeningHours;
+    /** @ignore */
     #_timezone: string;
+    /** @ignore */
     #_holidays: string[];
+    /** @ignore */
     #_specialDays: IOpeningHours;
 
     get timezone(): string {
@@ -34,32 +43,37 @@ export class OpeningHours {
         return this.#_hours;
     }
 
+    /** @ignore */
+    #isInvalidDate = (date: string): boolean => {
+        const dt = DateTime.fromFormat(date, "yyyy-MM-dd");
+        return !dt.isValid;
+    }
+
     /**
      * Creates a new instance with the given opening hours in the specified time zone.
-     * @param {Object} hours - contains the opening hours for each day. If a weekday key is not defined, the opening
-     *                         hours on this particular day are unknown. If a weekday key references an empty array `[]`,
-     *                         the entity is closed on this day. In all other cases a weekday key references an array
-     *                         with multiple time frames in the format `["hh:mm", "hh:mm", ...]`.
-     * @param {string[]} hours.mon - the opening hours on Monday
-     * @param {string[]} hours.tue - the opening hours on Tuesday
-     * @param {string[]} hours.wed - the opening hours on Wednesday
-     * @param {string[]} hours.thu - the opening hours on Thursday
-     * @param {string[]} hours.fri - the opening hours on Friday
-     * @param {string[]} hours.sat - the opening hours on Saturday
-     * @param {string[]} hours.sun - the opening hours on Sunday
-     * @param {string[]} hours.hol - the opening hours on a holiday
-     * @param {string} timezone - the time zone of the entity
-     * @param {string[]} [holidays=[]] - set of holidays in the format `YYYY-MM-DD`
-     * @param {Object} [specialDays={}] - table of days with special opening hours. The keys of this object
+     * @param hours contains the opening hours for each day. If a weekday key is not defined, the opening
+     *        hours on this particular day are unknown. If a weekday key references an empty array `[]`,
+     *        the entity is closed on this day. In all other cases a weekday key references an array
+     *        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`.
+     * @param timezone the time zone of the entity
+     * @param holidays=[] set of holidays in the format `YYYY-MM-DD`
+     * @param specialDays={} table of days with special opening hours. The keys of this object
      *                                    must be in the form `YYYY-MM-DD`.
      */
     constructor(hours: IOpeningHours, timezone: string, holidays: string[] = [], specialDays: IOpeningHours = {}) {
+        if (holidays?.some(this.#isInvalidDate) || Object.keys(specialDays).some(this.#isInvalidDate)) {
+            throw Error("Invalid date keys in holidays or specialDays.");
+        }
+
+        const validKeys = (WEEKDAY_KEYS.concat(["hol"]));
+        if (!Object.keys(hours).every(key => validKeys.includes(key))) {
+            throw Error("Invalid key in hours object.");
+        }
+
         this.#_hours = hours;
         this.#_timezone = timezone;
         this.#_holidays = holidays;
         this.#_specialDays = specialDays;
-
-        // fixme: add checks that everything was in the right format
     }
 
     /**
@@ -68,7 +82,7 @@ export class OpeningHours {
      * @returns {string} three letter weekday key
      */
     static weekdayToWeekdayKey(weekday: number) {
-        switch(weekday) {
+        switch (weekday) {
             case 1: return "mon";
             case 2: return "tue";
             case 3: return "wed";
@@ -162,12 +176,7 @@ export class OpeningHours {
     /**
      * Folds the opening hours into a human readable string.
      *
-     * @param formatOptions formatting options with the following options:
-     *         - `hyphen` (default ` – `) divider between generated time ranges, e.g. the hypen in `10:00 – 12:00`
-     *         - `delimiter` (default `, `) delimiter between two time ranges, e.g. the comma in `10:00 – 12:00, 14:30 – 20:00`
-     *         - `locale` the locale is used when formatting the name of the day, requires an installed ICU or browser support
-     *         - `weekdayFormat` (default `short`) format for the representation of a weekday, defaults to the short format
-     *
+     * @param formatOptions formatting options.
      * @see https://moment.github.io/luxon/docs/manual/intl.html
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
      */

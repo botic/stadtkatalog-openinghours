@@ -10,11 +10,13 @@
   "scripts": {
     "prepare": "npm run build",
     "test": "NODE_ICU_DATA=node_modules/full-icu && jest",
-    "build": "tsc"
+    "build": "tsc",
+    "doc": "typedoc --out ./doc --theme markdown --hideSources --hideBreadcrumbs --includeVersion --readme none ./src",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/stadtkatalog/openinghours.git"
+    "url": "git+https://github.com/botic/stadtkatalog-openinghours.git"
   },
   "keywords": [
     "stadtkatalog",
@@ -37,6 +39,8 @@
     "full-icu": "^1.3.1",
     "jest": "^25.4.0",
     "ts-jest": "^25.4.0",
+    "typedoc": "^0.17.6",
+    "typedoc-plugin-markdown": "^2.2.17",
     "typescript": "^3.8.3"
   },
   "dependencies": {
