@@ -1,4 +1,4 @@
-# StadtKatalog Opening Hours
+# @stadtkatalog/openinghours
 
 This library helps you to work with opening hours received from StadtKatalog.org
 
@@ -114,30 +114,30 @@ Stores opening hours and provides methods to work with them.
 
 ### Constructors
 
-\+ **new OpeningHours**(`hours`: [IOpeningHours](../interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[]): *[OpeningHours](_openinghours_.openinghours.md)*
+\+ **new OpeningHours**(`hours`: [IOpeningHours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[]): *[OpeningHours](_openinghours_.openinghours.md)*
 
-[Constructor details](_openinghours_.openinghours.md#constructors)
+[Constructor details](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#constructors)
 
 ### Accessors
 
-* [holidays](_openinghours_.openinghours.md#holidays)
-* [hours](_openinghours_.openinghours.md#hours)
-* [specialDays](_openinghours_.openinghours.md#specialdays)
-* [timezone](_openinghours_.openinghours.md#timezone)
+* [holidays](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#holidays)
+* [hours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#hours)
+* [specialDays](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#specialdays)
+* [timezone](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#timezone)
 
 ### Methods
 
-* [fold](_openinghours_.openinghours.md#fold)
-* [getOverlongPrecedingWeekdayKey](_openinghours_.openinghours.md#getoverlongprecedingweekdaykey)
-* [isHoliday](_openinghours_.openinghours.md#isholiday)
-* [isOpenAt](_openinghours_.openinghours.md#isopenat)
-* [isSpecialDay](_openinghours_.openinghours.md#isspecialday)
-* [isUnknown](_openinghours_.openinghours.md#isunknown)
-* [weekdayToWeekdayKey](_openinghours_.openinghours.md#static-weekdaytoweekdaykey)
+* [fold](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#fold)
+* [getOverlongPrecedingWeekdayKey](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#getoverlongprecedingweekdaykey)
+* [isHoliday](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#isholiday)
+* [isOpenAt](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#isopenat)
+* [isSpecialDay](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#isspecialday)
+* [isUnknown](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#isunknown)
+* [weekdayToWeekdayKey](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/classes/_openinghours_.openinghours.md#static-weekdaytoweekdaykey)
 
 ### Constructor Details
 
-\+ **new OpeningHours**(`hours`: [IOpeningHours](../interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[]): *[OpeningHours](_openinghours_.openinghours.md)*
+\+ **new OpeningHours**(`hours`: [IOpeningHours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[]): *[OpeningHours](_openinghours_.openinghours.md)*
 
 Creates a new instance with the given opening hours in the specified time zone.
 
@@ -145,7 +145,7 @@ Creates a new instance with the given opening hours in the specified time zone.
 
 Name | Type | Default | Description |
 ------ | ------ | ------ | ------ |
-`hours` | [IOpeningHours](../interfaces/_types_.iopeninghours.md) | - | contains the opening hours for each day. If a weekday key is not defined, the opening        hours on this particular day are unknown. If a weekday key references an empty array `[]`,        the entity is closed on this day. In all other cases a weekday key references an array        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`.        Special days must be in the form `YYYY-MM-DD` |
+`hours` | [IOpeningHours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.iopeninghours.md) | - | contains the opening hours for each day. If a weekday key is not defined, the opening        hours on this particular day are unknown. If a weekday key references an empty array `[]`,        the entity is closed on this day. In all other cases a weekday key references an array        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`.        Special days must be in the form `YYYY-MM-DD` |
 `timezone` | string | - | the time zone of the entity |
 `holidays` | string[] | [] | - |
 
@@ -163,17 +163,17 @@ ___
 
 ####  hours
 
-• **get hours**(): *[IOpeningHours](../interfaces/_types_.iopeninghours.md)*
+• **get hours**(): *[IOpeningHours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.iopeninghours.md)*
 
-**Returns:** *[IOpeningHours](../interfaces/_types_.iopeninghours.md)*
+**Returns:** *[IOpeningHours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.iopeninghours.md)*
 
 ___
 
 ####  specialDays
 
-• **get specialDays**(): *[IOpeningHours](../interfaces/_types_.iopeninghours.md)*
+• **get specialDays**(): *[IOpeningHours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.iopeninghours.md)*
 
-**Returns:** *[IOpeningHours](../interfaces/_types_.iopeninghours.md)*
+**Returns:** *[IOpeningHours](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.iopeninghours.md)*
 
 ___
 
@@ -187,7 +187,7 @@ ___
 
 ####  fold
 
-▸ **fold**(`formatOptions`: [FormatOptions](../interfaces/_types_.formatoptions.md)): *string*
+▸ **fold**(`formatOptions`: [FormatOptions](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.formatoptions.md)): *string*
 
 Folds the opening hours into a human readable string.
 
@@ -199,7 +199,7 @@ Folds the opening hours into a human readable string.
 
 Name | Type | Default | Description |
 ------ | ------ | ------ | ------ |
-`formatOptions` | [FormatOptions](../interfaces/_types_.formatoptions.md) | {} | formatting options. |
+`formatOptions` | [FormatOptions](https://github.com/botic/stadtkatalog-openinghours/blob/master/doc/interfaces/_types_.formatoptions.md) | {} | formatting options. |
 
 **Returns:** *string*
 
