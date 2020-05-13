@@ -19,13 +19,13 @@ const DEFAULT_LOCALE = Intl.DateTimeFormat().resolvedOptions().locale;
  */
 export class OpeningHours {
     /** @ignore */
-    #_hours: IOpeningHours;
-    /** @ignore */
     #_timezone: string;
     /** @ignore */
     #_holidays: string[];
     /** @ignore */
-    #_specialDays: IOpeningHours;
+    #_hours = {} as IOpeningHours;
+    /** @ignore */
+    #_specialDays = {} as IOpeningHours;
 
     get timezone(): string {
         return this.#_timezone;
@@ -55,25 +55,30 @@ export class OpeningHours {
      *        hours on this particular day are unknown. If a weekday key references an empty array `[]`,
      *        the entity is closed on this day. In all other cases a weekday key references an array
      *        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`.
+     *        Special days must be in the form `YYYY-MM-DD`
      * @param timezone the time zone of the entity
      * @param holidays=[] set of holidays in the format `YYYY-MM-DD`
-     * @param specialDays={} table of days with special opening hours. The keys of this object
-     *                                    must be in the form `YYYY-MM-DD`.
      */
-    constructor(hours: IOpeningHours, timezone: string, holidays: string[] = [], specialDays: IOpeningHours = {}) {
-        if (holidays?.some(this.#isInvalidDate) || Object.keys(specialDays).some(this.#isInvalidDate)) {
+    constructor(hours: IOpeningHours, timezone: string, holidays: string[] = []) {
+        if (holidays?.some(this.#isInvalidDate)) {
             throw Error("Invalid date keys in holidays or specialDays.");
         }
 
         const validKeys = (WEEKDAY_KEYS.concat(["hol"]));
-        if (!Object.keys(hours).every(key => validKeys.includes(key))) {
-            throw Error("Invalid key in hours object.");
+        for (const key of Object.keys(hours)) {
+            if (validKeys.includes(key)) {
+                this.#_hours [key] = hours[key];
+            } else {
+                if (this.#isInvalidDate(key)) {
+                    throw Error(`Invalid key '${key}' in hours object.`);
+                } else {
+                    this.#_specialDays[key] = hours[key];
+                }
+            }
         }
 
-        this.#_hours = hours;
         this.#_timezone = timezone;
         this.#_holidays = holidays;
-        this.#_specialDays = specialDays;
     }
 
     /**
@@ -197,6 +202,7 @@ export class OpeningHours {
             timeFrameFormat,
             timeFrameDelimiter,
             closedPlaceholder,
+            specialDates,
         } = Object.assign({}, {
             hyphen: "\u202F\u2013\u202F",
             delimiter: ", ",
@@ -205,7 +211,13 @@ export class OpeningHours {
             holidayPrefix: "Holidays",
             timeFrameFormat: "{start} to {end}",
             timeFrameDelimiter: " and ",
-            closedPlaceholder: "Closed"
+            closedPlaceholder: "Closed",
+            specialDates: {
+                format: "yyyy-MM-dd",
+                from: undefined,
+                to: undefined,
+            }
+
         }, formatOptions) as FormatOptions;
 
         const reducedTimeRange = _eliminateEqualRanges(this.#_hours);
@@ -245,19 +257,21 @@ export class OpeningHours {
             }
         });
 
-        return rangeStrings
-            .filter(foldedDayRange => foldedDayRange.timeFrames.length > 0)
-            .map(foldedDayRange => {
-                return foldedDayRange.days + ": " +
-                    _formatTimeFrames(
-                        foldedDayRange.timeFrames,
-                        // @ts-ignore
-                        timeFrameFormat,
-                        timeFrameDelimiter,
-                        closedPlaceholder,
-                    )
-            }).join("\n") +  (
-            Array.isArray(this.#_hours.hol) && this.#_hours.hol.length > 0
+        return (
+            rangeStrings
+                .filter(foldedDayRange => foldedDayRange.timeFrames.length > 0)
+                .map(foldedDayRange => {
+                    return foldedDayRange.days + ": " +
+                        _formatTimeFrames(
+                            foldedDayRange.timeFrames,
+                            // @ts-ignore
+                            timeFrameFormat,
+                            timeFrameDelimiter,
+                            closedPlaceholder,
+                        )
+                }).join("\n")
+            + (
+                Array.isArray(this.#_hours.hol) && this.#_hours.hol.length > 0
                     ? `\n${holidayPrefix}: ${_formatTimeFrames(
                         this.#_hours.hol,
                         // @ts-ignore
@@ -266,6 +280,51 @@ export class OpeningHours {
                         closedPlaceholder,
                     )}`
                     : ""
-            );
+            )
+            + Object.keys(this.#_specialDays)
+                .map(date => {
+                    return {
+                        date,
+                        dt: DateTime.fromFormat(date, "yyyy-MM-dd", {
+                            zone: this.#_timezone
+                        }),
+                        timeFrames: this.#_specialDays[date]
+                    };
+                })
+                .filter(({ dt, timeFrames}) => {
+                    if (!dt.isValid) {
+                        return false;
+                    }
+
+                    const from = DateTime
+                        .fromJSDate(specialDates?.from || new Date())
+                        .startOf("day")
+                        .setZone(this.#_timezone);
+                    if (dt.toSeconds() < from.toSeconds()) {
+                        return false;
+                    }
+
+                    if (specialDates?.to instanceof Date) {
+                        const to = DateTime
+                            .fromJSDate(specialDates.to)
+                            .endOf("day")
+                            .setZone(this.#_timezone);
+                        if (dt.toSeconds() > to.toSeconds()) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                .map(({date, dt, timeFrames}) => {
+                        return `\n${dt.toFormat(specialDates?.format || "yyyy-MM-dd")}: ${_formatTimeFrames(
+                            timeFrames || [],
+                            // @ts-ignore
+                            timeFrameFormat,
+                            timeFrameDelimiter,
+                            closedPlaceholder,
+                        )}`;
+                }).join("")
+        ).replace(/^\n+/, "");
     }
 }

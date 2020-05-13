@@ -122,4 +122,15 @@ export interface FormatOptions {
      * Placeholder if empty time frames = closed.
      */
     closedPlaceholder?: string;
+
+    /**
+     * Format for dates with special opening hours, which have keys in the form  'yyyy-MM-dd'.
+     * The range of included special dates can be limited with the `from` and `to` property.
+     * @see https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
+     */
+    specialDates?: {
+        format?: string;
+        from?: Date | undefined;
+        to?: Date | undefined;
+    }
 }

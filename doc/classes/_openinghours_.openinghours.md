@@ -29,13 +29,14 @@ Stores opening hours and provides methods to work with them.
 * [isHoliday](_openinghours_.openinghours.md#isholiday)
 * [isOpenAt](_openinghours_.openinghours.md#isopenat)
 * [isSpecialDay](_openinghours_.openinghours.md#isspecialday)
+* [isUnknown](_openinghours_.openinghours.md#isunknown)
 * [weekdayToWeekdayKey](_openinghours_.openinghours.md#static-weekdaytoweekdaykey)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new OpeningHours**(`hours`: [IOpeningHours](../interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[], `specialDays`: [IOpeningHours](../interfaces/_types_.iopeninghours.md)): *[OpeningHours](_openinghours_.openinghours.md)*
+\+ **new OpeningHours**(`hours`: [IOpeningHours](../interfaces/_types_.iopeninghours.md), `timezone`: string, `holidays`: string[]): *[OpeningHours](_openinghours_.openinghours.md)*
 
 Creates a new instance with the given opening hours in the specified time zone.
 
@@ -43,10 +44,9 @@ Creates a new instance with the given opening hours in the specified time zone.
 
 Name | Type | Default | Description |
 ------ | ------ | ------ | ------ |
-`hours` | [IOpeningHours](../interfaces/_types_.iopeninghours.md) | - | contains the opening hours for each day. If a weekday key is not defined, the opening        hours on this particular day are unknown. If a weekday key references an empty array `[]`,        the entity is closed on this day. In all other cases a weekday key references an array        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`. |
+`hours` | [IOpeningHours](../interfaces/_types_.iopeninghours.md) | - | contains the opening hours for each day. If a weekday key is not defined, the opening        hours on this particular day are unknown. If a weekday key references an empty array `[]`,        the entity is closed on this day. In all other cases a weekday key references an array        with multiple time frames in the format `["hh:mm", "hh:mm", ...]`.        Special days must be in the form `YYYY-MM-DD` |
 `timezone` | string | - | the time zone of the entity |
 `holidays` | string[] | [] | - |
-`specialDays` | [IOpeningHours](../interfaces/_types_.iopeninghours.md) | {} | - |
 
 **Returns:** *[OpeningHours](_openinghours_.openinghours.md)*
 
@@ -175,6 +175,16 @@ Name | Type | Description |
 **Returns:** *boolean*
 
 `true` if holiday, `false` otherwise
+
+___
+
+###  isUnknown
+
+▸ **isUnknown**(): *boolean*
+
+Returns true if the opening hours represented by the instance are unknown.
+
+**Returns:** *boolean*
 
 ___
 

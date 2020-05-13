@@ -25,9 +25,7 @@ test("test simple day with different time zone", () => {
 });
 
 test("test simple day with special hours", () => {
-    const bh = new OpeningHours({ fri: ["10:00", "12:00"] }, "UTC", [], {
-        "2016-09-09": ["14:00", "16:00"]
-    });
+    const bh = new OpeningHours({ fri: ["10:00", "12:00"], "2016-09-09": ["14:00", "16:00"] }, "UTC", []);
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 9, 9, 59, 59, 999)))).toBe(false);
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 9, 10, 0, 0, 0)))).toBe(false);
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 9, 11, 59, 59, 999)))).toBe(false);
@@ -40,9 +38,7 @@ test("test simple day with special hours", () => {
 });
 
 test("test day with preceding overlong special hours", () => {
-    const bh = new OpeningHours({ fri: ["10:00", "12:00"] }, "UTC", [], {
-        "2016-09-08": ["14:00", "26:00"]
-    });
+    const bh = new OpeningHours({ fri: ["10:00", "12:00"], "2016-09-08": ["14:00", "26:00"] }, "UTC", []);
 
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 8, 13, 59, 59, 999)))).toBe(false);
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 8, 14, 0, 0, 0)))).toBe(true);
@@ -66,9 +62,7 @@ test("test day with preceding overlong special hours", () => {
 
 
 test("test simple day with special hours and overlapping normal hours", () => {
-    const bh = new OpeningHours({ thu: ["20:00", "26:00"], fri: ["10:00", "12:00"] }, "UTC", [], {
-        "2016-09-09": ["14:00", "16:00"]
-    });
+    const bh = new OpeningHours({ thu: ["20:00", "26:00"], fri: ["10:00", "12:00"], "2016-09-09": ["14:00", "16:00"] }, "UTC", []);
 
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 8, 23, 59, 59, 999)))).toBe(true);
     expect(bh.isOpenAt(new Date(Date.UTC(2016, 8, 9, 0, 0, 0, 0)))).toBe(true);

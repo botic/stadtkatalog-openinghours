@@ -16,6 +16,7 @@ Formatting options for folded opening hours.
 * [holidayPrefix](_types_.formatoptions.md#optional-holidayprefix)
 * [hyphen](_types_.formatoptions.md#optional-hyphen)
 * [locale](_types_.formatoptions.md#optional-locale)
+* [specialDates](_types_.formatoptions.md#optional-specialdates)
 * [timeFrameDelimiter](_types_.formatoptions.md#optional-timeframedelimiter)
 * [timeFrameFormat](_types_.formatoptions.md#optional-timeframeformat)
 * [weekdayFormat](_types_.formatoptions.md#optional-weekdayformat)
@@ -59,6 +60,17 @@ ___
 • **locale**? : *undefined | string*
 
 the locale is used when formatting the name of the day, requires an installed ICU or browser support
+
+___
+
+### `Optional` specialDates
+
+• **specialDates**? : *undefined | object*
+
+Format for dates with special opening hours, which have keys in the form  'yyyy-MM-dd'.
+The range of included special dates can be limited with the `from` and `to` property.
+
+**`see`** https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
 
 ___
 
