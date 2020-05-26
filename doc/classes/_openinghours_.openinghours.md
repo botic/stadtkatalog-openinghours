@@ -30,6 +30,7 @@ Stores opening hours and provides methods to work with them.
 * [isOpenAt](_openinghours_.openinghours.md#isopenat)
 * [isSpecialDay](_openinghours_.openinghours.md#isspecialday)
 * [isUnknown](_openinghours_.openinghours.md#isunknown)
+* [reduce](_openinghours_.openinghours.md#reduce)
 * [weekdayToWeekdayKey](_openinghours_.openinghours.md#static-weekdaytoweekdaykey)
 
 ## Constructors
@@ -185,6 +186,28 @@ ___
 Returns true if the opening hours represented by the instance are unknown.
 
 **Returns:** *boolean*
+
+___
+
+###  reduce
+
+▸ **reduce**(`formatOptions`: [FormatOptions](../interfaces/_types_.formatoptions.md)): *[RangeTimeSpan](../interfaces/_types_.rangetimespan.md)[]*
+
+Reduces the opening hours into an array of so-called `RangeTimeSpan` elements.
+All elements in the array are in the most compact form possible. Consecutive matching time ranges will be merged
+into a single elements with a day range as weekday string.
+
+**`see`** https://moment.github.io/luxon/docs/manual/intl.html
+
+**`see`** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
+
+**Parameters:**
+
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`formatOptions` | [FormatOptions](../interfaces/_types_.formatoptions.md) | {} | formatting options. |
+
+**Returns:** *[RangeTimeSpan](../interfaces/_types_.rangetimespan.md)[]*
 
 ___
 
