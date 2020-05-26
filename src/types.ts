@@ -134,3 +134,15 @@ export interface FormatOptions {
         to?: Date | undefined;
     }
 }
+
+export enum RangeType {
+    weekday = "weekday",
+    holiday = "holiday",
+    special = "special",
+}
+
+export interface RangeTimeSpan {
+    type: RangeType;
+    range: string;
+    timespan: string;
+}

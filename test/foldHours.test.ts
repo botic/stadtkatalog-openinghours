@@ -123,6 +123,7 @@ test("fold with special days", () => {
 Dienstag: 08:00 bis 13:00 Uhr
 Mittwoch, Freitag: 08:00 bis 11:00 Uhr
 Donnerstag: 14:00 bis 19:00 Uhr
+Feiertags: geschlossen
 2018-08-23: geschlossen
 2018-08-24: geschlossen
 2018-08-27: geschlossen
@@ -150,6 +151,7 @@ expect(oh.fold({
 Dienstag: 08:00 bis 13:00 Uhr
 Mittwoch, Freitag: 08:00 bis 11:00 Uhr
 Donnerstag: 14:00 bis 19:00 Uhr
+Feiertags: geschlossen
 2018 -- 8 .. 28: geschlossen
 2018 -- 8 .. 29: geschlossen
 2018 -- 9 .. 19: geschlossen`);
@@ -171,7 +173,68 @@ Donnerstag: 14:00 bis 19:00 Uhr
     })).toBe(`Montag: 09:00 bis 12:00 Uhr und 15:00 bis 19:00 Uhr
 Dienstag: 08:00 bis 13:00 Uhr
 Mittwoch, Freitag: 08:00 bis 11:00 Uhr
-Donnerstag: 14:00 bis 19:00 Uhr`);
+Donnerstag: 14:00 bis 19:00 Uhr
+Feiertags: geschlossen`);
+
+    oh = new OpeningHours({
+        "mon": [
+            "09:00",
+            "12:00",
+            "15:00",
+            "19:00",
+        ],
+        "tue": [
+            "08:00",
+            "13:00",
+        ],
+        "wed": [
+            "08:00",
+            "11:00",
+        ],
+        "thu": [
+            "14:00",
+            "19:00",
+        ],
+        "fri": [
+            "08:00",
+            "11:00",
+        ],
+        "sat": [],
+        "sun": [],
+        "2018-08-23": [],
+        "2018-08-24": [],
+        "2018-08-27": [],
+        "2018-08-28": [],
+        "2018-08-29": [],
+        "2018-09-19": [],
+        "2018-09-20": [],
+        "2018-09-21": [],
+    }, "UTC");
+
+    expect(oh.fold({
+        hyphen: " – ",
+        delimiter: ", ",
+        timeFrameFormat: "{start} bis {end} Uhr",
+        timeFrameDelimiter: " und ",
+        locale: "de-AT",
+        holidayPrefix: "Feiertags",
+        weekdayFormat: WeekdayFormat.long,
+        closedPlaceholder: "geschlossen",
+        specialDates: {
+            from: new Date(2018, 0, 1)
+        }
+    })).toBe(`Montag: 09:00 bis 12:00 Uhr und 15:00 bis 19:00 Uhr
+Dienstag: 08:00 bis 13:00 Uhr
+Mittwoch, Freitag: 08:00 bis 11:00 Uhr
+Donnerstag: 14:00 bis 19:00 Uhr
+2018-08-23: geschlossen
+2018-08-24: geschlossen
+2018-08-27: geschlossen
+2018-08-28: geschlossen
+2018-08-29: geschlossen
+2018-09-19: geschlossen
+2018-09-20: geschlossen
+2018-09-21: geschlossen`);
 });
 
 test("folds special days correctly", () => {

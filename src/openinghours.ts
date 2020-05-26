@@ -1,5 +1,5 @@
 import {DateTime} from "luxon";
-import {FormatOptions, IOpeningHours, WeekdayFormat} from "./types";
+import {FormatOptions, IOpeningHours, RangeTimeSpan, RangeType, WeekdayFormat} from "./types";
 import {
     _areOverlongTimeFrames,
     _canFoldIntoDayRange,
@@ -186,13 +186,15 @@ export class OpeningHours {
     }
 
     /**
-     * Folds the opening hours into a human readable string.
+     * Reduces the opening hours into an array of so-called `RangeTimeSpan` elements.
+     * All elements in the array are in the most compact form possible. Consecutive matching time ranges will be merged
+     * into a single elements with a day range as weekday string.
      *
      * @param formatOptions formatting options.
      * @see https://moment.github.io/luxon/docs/manual/intl.html
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
      */
-    fold(formatOptions: FormatOptions = {}) {
+    reduce(formatOptions: FormatOptions = {}): RangeTimeSpan[] {
         const {
             hyphen,
             delimiter,
@@ -219,6 +221,11 @@ export class OpeningHours {
             }
 
         }, formatOptions) as FormatOptions;
+
+        // type guard for potential undefined values in user-provided options
+        if (holidayPrefix === undefined || timeFrameDelimiter === undefined || timeFrameFormat === undefined || closedPlaceholder === undefined) {
+            throw new TypeError(`Invalid options object: format options cannot use undefined as value.`);
+        }
 
         const reducedTimeRange = _eliminateEqualRanges(this.#_hours);
         const someMonday = DateTime
@@ -257,74 +264,98 @@ export class OpeningHours {
             }
         });
 
-        return (
-            rangeStrings
-                .filter(foldedDayRange => foldedDayRange.timeFrames.length > 0)
-                .map(foldedDayRange => {
-                    return foldedDayRange.days + ": " +
-                        _formatTimeFrames(
-                            foldedDayRange.timeFrames,
-                            // @ts-ignore
-                            timeFrameFormat,
-                            timeFrameDelimiter,
-                            closedPlaceholder,
-                        )
-                }).join("\n")
-            + (
-                Array.isArray(this.#_hours.hol) && this.#_hours.hol.length > 0
-                    ? `\n${holidayPrefix}: ${_formatTimeFrames(
-                        this.#_hours.hol,
-                        // @ts-ignore
+        const reducedHours = rangeStrings.filter(foldedDayRange => foldedDayRange.timeFrames.length > 0)
+            .map(foldedDayRange => {
+                return {
+                    type: RangeType.weekday,
+                    range: foldedDayRange.days,
+                    timespan: _formatTimeFrames(
+                        foldedDayRange.timeFrames,
                         timeFrameFormat,
                         timeFrameDelimiter,
                         closedPlaceholder,
-                    )}`
-                    : ""
-            )
-            + Object.keys(this.#_specialDays)
-                .map(date => {
-                    return {
-                        date,
-                        dt: DateTime.fromFormat(date, "yyyy-MM-dd", {
-                            zone: this.#_timezone
-                        }),
-                        timeFrames: this.#_specialDays[date]
-                    };
-                })
-                .filter(({ dt, timeFrames}) => {
-                    if (!dt.isValid) {
-                        return false;
-                    }
+                    ),
+                };
+            });
 
-                    const from = DateTime
-                        .fromJSDate(specialDates?.from || new Date())
-                        .startOf("day")
+        if (Array.isArray(this.#_hours.hol)) {
+            reducedHours.push({
+                type: RangeType.holiday,
+                range: holidayPrefix,
+                timespan: _formatTimeFrames(
+                    this.#_hours.hol,
+                    timeFrameFormat,
+                    timeFrameDelimiter,
+                    closedPlaceholder,
+                )
+            });
+        }
+
+        Object.keys(this.#_specialDays)
+            .map(date => {
+                return {
+                    date,
+                    dt: DateTime.fromFormat(date, "yyyy-MM-dd", {
+                        zone: this.#_timezone
+                    }),
+                    timeFrames: this.#_specialDays[date]
+                };
+            })
+            .filter(({ dt, timeFrames}) => {
+                if (!dt.isValid) {
+                    return false;
+                }
+
+                const from = DateTime
+                    .fromJSDate(specialDates?.from || new Date())
+                    .startOf("day")
+                    .setZone(this.#_timezone);
+                if (dt.toSeconds() < from.toSeconds()) {
+                    return false;
+                }
+
+                if (specialDates?.to instanceof Date) {
+                    const to = DateTime
+                        .fromJSDate(specialDates.to)
+                        .endOf("day")
                         .setZone(this.#_timezone);
-                    if (dt.toSeconds() < from.toSeconds()) {
+                    if (dt.toSeconds() > to.toSeconds()) {
                         return false;
                     }
+                }
 
-                    if (specialDates?.to instanceof Date) {
-                        const to = DateTime
-                            .fromJSDate(specialDates.to)
-                            .endOf("day")
-                            .setZone(this.#_timezone);
-                        if (dt.toSeconds() > to.toSeconds()) {
-                            return false;
-                        }
-                    }
+                return true;
+            })
+            .sort((a, b) => a.dt.toMillis() - b.dt.toMillis())
+            .map(({date, dt, timeFrames}) => [
+                dt.toFormat(specialDates?.format || "yyyy-MM-dd"),
+                _formatTimeFrames(
+                    timeFrames || [],
+                    timeFrameFormat,
+                    timeFrameDelimiter,
+                    closedPlaceholder,
+                )
+            ])
+            .forEach(val => reducedHours.push({
+                type: RangeType.special,
+                range: val[0],
+                timespan: val[1],
+            }));
 
-                    return true;
-                })
-                .map(({date, dt, timeFrames}) => {
-                        return `\n${dt.toFormat(specialDates?.format || "yyyy-MM-dd")}: ${_formatTimeFrames(
-                            timeFrames || [],
-                            // @ts-ignore
-                            timeFrameFormat,
-                            timeFrameDelimiter,
-                            closedPlaceholder,
-                        )}`;
-                }).join("")
-        ).replace(/^\n+/, "");
+        return reducedHours;
+    }
+
+    /**
+     * Folds the opening hours into a human readable string.
+     *
+     * @param formatOptions formatting options.
+     * @see https://moment.github.io/luxon/docs/manual/intl.html
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
+     */
+    fold(formatOptions: FormatOptions = {}): string {
+        return this
+            .reduce(formatOptions)
+            .map(rangeTimeSpan => `${rangeTimeSpan.range}: ${rangeTimeSpan.timespan}`)
+            .join("\n");
     }
 }
