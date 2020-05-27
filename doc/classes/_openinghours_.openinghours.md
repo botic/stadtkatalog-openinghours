@@ -87,7 +87,7 @@ ___
 
 ###  fold
 
-▸ **fold**(`formatOptions`: [FormatOptions](../interfaces/_types_.formatoptions.md)): *string*
+▸ **fold**(`formatOptions`: [FormatOptions](../interfaces/_types_.formatoptions.md), `separator`: string): *string*
 
 Folds the opening hours into a human readable string.
 
@@ -100,6 +100,8 @@ Folds the opening hours into a human readable string.
 Name | Type | Default | Description |
 ------ | ------ | ------ | ------ |
 `formatOptions` | [FormatOptions](../interfaces/_types_.formatoptions.md) | {} | formatting options. |
+`separator` | string | "
+" | the string to separate adjacent range timespans. |
 
 **Returns:** *string*
 

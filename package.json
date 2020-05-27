@@ -1,6 +1,6 @@
 {
   "name": "@stadtkatalog/openinghours",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "StadtKatalog opening hours library.",
   "main": "lib/openinghours.js",
   "types": "lib/openinghours.d.ts",
@@ -12,7 +12,7 @@
     "test": "NODE_ICU_DATA=node_modules/full-icu && jest",
     "build": "tsc",
     "doc": "typedoc --out ./doc --theme markdown --hideSources --hideBreadcrumbs --includeVersion --readme none ./src",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test && npm run doc"
   },
   "repository": {
     "type": "git",

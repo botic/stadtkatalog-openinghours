@@ -1,5 +1,5 @@
 
-# @stadtkatalog/openinghours - v3.0.0
+# @stadtkatalog/openinghours - v3.1.0
 
 ## Index
 

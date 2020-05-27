@@ -3,6 +3,8 @@
 
 Possible formats for the representation of a weekday.
 
+**`see`** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat#Syntax
+
 ## Index
 
 ### Enumeration members

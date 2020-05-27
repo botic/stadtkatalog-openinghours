@@ -27,7 +27,7 @@ Formatting options for folded opening hours.
 
 • **closedPlaceholder**? : *undefined | string*
 
-Placeholder if empty time frames = closed.
+Placeholder if time frames are empty, which indicate a closed business on the corresponding weekdays or dates.
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **delimiter**? : *undefined | string*
 
-delimiter between two time ranges, e.g. the comma in `"10:00 – 12:00, 14:30 – 20:00"`, default `", "`
+Delimiter between two time ranges, e.g. the comma in `"10:00 – 12:00, 14:30 – 20:00"`, default `", "`
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 • **locale**? : *undefined | string*
 
-the locale is used when formatting the name of the day, requires an installed ICU or browser support
+The locale is used when formatting the name of the day, requires an installed ICU or browser support
 
 ___
 
@@ -67,10 +67,8 @@ ___
 
 • **specialDates**? : *undefined | object*
 
-Format for dates with special opening hours, which have keys in the form  'yyyy-MM-dd'.
+Format options and range filters for dates with special opening hours, which have keys in the form `yyyy-MM-dd`.
 The range of included special dates can be limited with the `from` and `to` property.
-
-**`see`** https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
 
 ___
 
@@ -94,4 +92,4 @@ ___
 
 • **weekdayFormat**? : *[WeekdayFormat](../enums/_types_.weekdayformat.md)*
 
-format for the representation of a weekday, default `"short"`
+Format for the representation of a weekday, default `"short"`

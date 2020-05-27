@@ -33,7 +33,7 @@ shop.isOpenAt(new Date(2018, 7, 13, 18, 0));  // false
 * Opening hours are an object with the zero or more of the following properties:
   * Weekdays: `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun`
   * Holidays: `hol`
-  * Specific dates: `yyyy-MM-dd`, e.g. `2020-03-30`
+  * Special dates for day-specific hours: `yyyy-MM-dd`, e.g. `2020-03-30`
 * Every property has an associated array with time frames:
   * `[]` – closed, not opened at the given date or weekday
   * `["HH:mm", "HH:mm"]` – open between the two time frames
