@@ -65,7 +65,7 @@ ___
 
 ### `Optional` specialDates
 
-• **specialDates**? : *undefined | object*
+• **specialDates**? : *[SpecialDatesFormat](_types_.specialdatesformat.md)*
 
 Format options and range filters for dates with special opening hours, which have keys in the form `yyyy-MM-dd`.
 The range of included special dates can be limited with the `from` and `to` property.
