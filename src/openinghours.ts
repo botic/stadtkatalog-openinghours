@@ -349,13 +349,14 @@ export class OpeningHours {
      * Folds the opening hours into a human readable string.
      *
      * @param formatOptions formatting options.
+     * @param separator the string to separate adjacent range timespans.
      * @see https://moment.github.io/luxon/docs/manual/intl.html
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
      */
-    fold(formatOptions: FormatOptions = {}): string {
+    fold(formatOptions: FormatOptions = {}, separator = "\n"): string {
         return this
             .reduce(formatOptions)
             .map(rangeTimeSpan => `${rangeTimeSpan.range}: ${rangeTimeSpan.timespan}`)
-            .join("\n");
+            .join(separator);
     }
 }
