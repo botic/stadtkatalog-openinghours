@@ -1,5 +1,5 @@
 import {DateTime, Interval} from "luxon";
-import {IOpeningHours} from "./types";
+import {FoldedSpecialDayRange, IOpeningHours, SpecialDateTimeFrames} from "./types";
 
 export const WEEKDAY_KEYS = Object.freeze(["mon", "tue", "wed", "thu", "fri", "sat", "sun"]) as string[];
 
@@ -11,7 +11,7 @@ export const WEEKDAY_KEYS = Object.freeze(["mon", "tue", "wed", "thu", "fri", "s
  * @returns {boolean} true, if `ldt` is contained in the time frame; false otherwise
  * @private
  */
-export function _isInTimeFrame(ldt: DateTime, startFrame: string, endFrame: string) {
+export function _isInTimeFrame(ldt: DateTime, startFrame: string, endFrame: string): boolean {
     const startTime = startFrame.split(":").map(frame => Number.parseInt(frame, 10));
     const endTime = endFrame.split(":").map(frame => Number.parseInt(frame, 10));
 
@@ -22,11 +22,9 @@ export function _isInTimeFrame(ldt: DateTime, startFrame: string, endFrame: stri
 }
 
 /**
- *
- * @param timeFrames
  * @private
  */
-export function _areOverlongTimeFrames(timeFrames?: string[]) {
+export function _areOverlongTimeFrames(timeFrames?: string[]): boolean {
     // no opening hours defined
     if (!timeFrames) {
         return false;
@@ -37,11 +35,13 @@ export function _areOverlongTimeFrames(timeFrames?: string[]) {
 }
 
 /**
- *
- * @param overlongTimeFrames
  * @private
  */
-export function _getAdditionalStartOfDayTimeFrames(overlongTimeFrames: string[]) {
+export function _getAdditionalStartOfDayTimeFrames(overlongTimeFrames: string[]): string[] {
+    if (overlongTimeFrames.length === 0) {
+        return [];
+    }
+
     const overflowingHours = overlongTimeFrames
         .slice(-1)[0]
         .split(":")
@@ -59,11 +59,9 @@ export function _getAdditionalStartOfDayTimeFrames(overlongTimeFrames: string[])
 }
 
 /**
- *
- * @param reducedTimeRange
  * @private
  */
-export function _createRangeBag(reducedTimeRange: number[]) {
+export function _createRangeBag(reducedTimeRange: number[]): { [propName: string]: number[] } {
     const rangeBag = {} as {
         [propName: string]: number[];
     };
@@ -81,12 +79,9 @@ export function _createRangeBag(reducedTimeRange: number[]) {
 }
 
 /**
- *
- * @param a
- * @param b
  * @private
  */
-export function _equalTimeFrames(a: string[] | undefined, b: string[] | undefined) {
+export function _equalTimeFrames(a: string[] | undefined, b: string[] | undefined): boolean {
     if (!a || !b || a.length !== b.length) {
         return false;
     }
@@ -101,11 +96,9 @@ export function _equalTimeFrames(a: string[] | undefined, b: string[] | undefine
 }
 
 /**
- *
- * @param week
  * @private
  */
-export function _findSimpleRanges(week: IOpeningHours) {
+export function _findSimpleRanges(week: IOpeningHours): number[] {
     const reduced = [0];
     for (let i = 1; i < WEEKDAY_KEYS.length; i++) {
         let prevDay = week[WEEKDAY_KEYS[i - 1]],
@@ -116,7 +109,10 @@ export function _findSimpleRanges(week: IOpeningHours) {
     return reduced;
 }
 
-export function _eliminateEqualRanges(week: IOpeningHours) {
+/**
+ * @private
+ */
+export function _eliminateEqualRanges(week: IOpeningHours): number[] {
     const weekRanges = _findSimpleRanges(week);
     const dedupedRanges = [];
     for (let i = weekRanges.length - 1; i >= 0; i--) {
@@ -134,13 +130,61 @@ export function _eliminateEqualRanges(week: IOpeningHours) {
     return dedupedRanges;
 }
 
-export function _canFoldIntoDayRange(range: number[]) {
+/**
+ * @private
+ */
+export function _canFoldIntoDayRange(range: number[]): boolean {
     return range.every((dayNumber: number, idx: number, arr: number[]) => {
         return !idx || dayNumber === arr[idx - 1] || dayNumber === arr[idx - 1] + 1;
     })
 }
 
-export function _formatTimeFrames(hours: string[], format: string, delimiter: string, placeholder: string) {
+/**
+ * @private
+ */
+export function _foldSpecialDayRanges(specialDays: SpecialDateTimeFrames[]): FoldedSpecialDayRange[] {
+    const ranges = [];
+
+    let currentRangeStart: SpecialDateTimeFrames|null = null,
+        currentRangeEnd: SpecialDateTimeFrames|null = null;
+    for (const day of specialDays.sort((a, b) => a.dt.diff(b.dt).milliseconds)) {
+        if (currentRangeEnd === null) {
+            currentRangeStart = day;
+            currentRangeEnd = day;
+            continue;
+        }
+
+        if (
+            _equalTimeFrames(day.timeFrames, currentRangeEnd.timeFrames) &&
+            day.dt.diff(currentRangeEnd.dt, "days").days === 1
+        ) {
+            currentRangeEnd = day;
+        } else {
+            // end of a continuous range met
+            ranges.push({
+                start: currentRangeStart,
+                end: currentRangeEnd,
+            });
+            currentRangeStart = day;
+            currentRangeEnd = day;
+        }
+    }
+    if (currentRangeStart !== null) {
+        ranges.push({
+            start: currentRangeStart,
+            end: currentRangeEnd,
+        });
+    }
+
+    return ranges.filter((x): x is FoldedSpecialDayRange => {
+        return x.start !== null && x.end !== null
+    });
+}
+
+/**
+ * @private
+ */
+export function _formatTimeFrames(hours: string[], format: string, delimiter: string, placeholder: string): string {
     if (hours.length === 0) {
         return placeholder || "";
     }

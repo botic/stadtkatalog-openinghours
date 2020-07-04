@@ -5,6 +5,7 @@ import {
     _canFoldIntoDayRange,
     _createRangeBag,
     _eliminateEqualRanges,
+    _foldSpecialDayRanges,
     _formatTimeFrames,
     _getAdditionalStartOfDayTimeFrames,
     _isInTimeFrame,
@@ -291,10 +292,9 @@ export class OpeningHours {
             });
         }
 
-        Object.keys(this.#_specialDays)
+        const specialDays = Object.keys(this.#_specialDays)
             .map(date => {
                 return {
-                    date,
                     dt: DateTime.fromFormat(date, "yyyy-MM-dd", {
                         zone: this.#_timezone
                     }),
@@ -302,7 +302,8 @@ export class OpeningHours {
                 };
             })
             .filter(({ dt, timeFrames}) => {
-                if (!dt.isValid) {
+                // this is just a guard; the constructor will never accept such inputs!
+                if (!dt.isValid || timeFrames === undefined) {
                     return false;
                 }
 
@@ -326,20 +327,28 @@ export class OpeningHours {
 
                 return true;
             })
-            .sort((a, b) => a.dt.toMillis() - b.dt.toMillis())
-            .map(({date, dt, timeFrames}) => [
-                dt.toFormat(specialDates?.format || "yyyy-MM-dd"),
-                _formatTimeFrames(
-                    timeFrames || [],
-                    timeFrameFormat,
-                    timeFrameDelimiter,
-                    closedPlaceholder,
-                )
-            ])
-            .forEach(val => reducedHours.push({
-                type: RangeType.special,
-                range: val[0],
-                timespan: val[1],
+            .filter((x): x is { dt: DateTime; date: string; timeFrames: string[]} => {
+                return x.timeFrames !== undefined;
+            })
+            .sort((a, b) => a.dt.toMillis() - b.dt.toMillis());
+
+        reducedHours.push(..._foldSpecialDayRanges(specialDays)
+            .map(({start, end}) => {
+                const range = start.dt.diff(end.dt, "milliseconds").milliseconds === 0
+                    ? start.dt.toFormat(formatOptions.specialDates?.format || "yyyy-MM-dd")
+                    : start.dt.toFormat(formatOptions.specialDates?.format || "yyyy-MM-dd") +
+                        hyphen + end.dt.toFormat(formatOptions.specialDates?.format || "yyyy-MM-dd");
+
+                return {
+                    type: RangeType.special,
+                    range,
+                    timespan: _formatTimeFrames(
+                        start.timeFrames,
+                        timeFrameFormat,
+                        timeFrameDelimiter,
+                        closedPlaceholder,
+                    ),
+                }
             }));
 
         return reducedHours;

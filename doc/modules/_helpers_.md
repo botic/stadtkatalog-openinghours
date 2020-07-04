@@ -10,12 +10,13 @@
 ### Functions
 
 * [_areOverlongTimeFrames](_helpers_.md#private-_areoverlongtimeframes)
-* [_canFoldIntoDayRange](_helpers_.md#_canfoldintodayrange)
+* [_canFoldIntoDayRange](_helpers_.md#private-_canfoldintodayrange)
 * [_createRangeBag](_helpers_.md#private-_createrangebag)
-* [_eliminateEqualRanges](_helpers_.md#_eliminateequalranges)
+* [_eliminateEqualRanges](_helpers_.md#private-_eliminateequalranges)
 * [_equalTimeFrames](_helpers_.md#private-_equaltimeframes)
 * [_findSimpleRanges](_helpers_.md#private-_findsimpleranges)
-* [_formatTimeFrames](_helpers_.md#_formattimeframes)
+* [_foldSpecialDayRanges](_helpers_.md#private-_foldspecialdayranges)
+* [_formatTimeFrames](_helpers_.md#private-_formattimeframes)
 * [_getAdditionalStartOfDayTimeFrames](_helpers_.md#private-_getadditionalstartofdaytimeframes)
 * [_isInTimeFrame](_helpers_.md#private-_isintimeframe)
 
@@ -41,7 +42,7 @@ Name | Type |
 
 ___
 
-###  _canFoldIntoDayRange
+### `Private` _canFoldIntoDayRange
 
 ▸ **_canFoldIntoDayRange**(`range`: number[]): *boolean*
 
@@ -71,7 +72,7 @@ Name | Type |
 
 ___
 
-###  _eliminateEqualRanges
+### `Private` _eliminateEqualRanges
 
 ▸ **_eliminateEqualRanges**(`week`: [IOpeningHours](../interfaces/_types_.iopeninghours.md)): *number[]*
 
@@ -114,7 +115,21 @@ Name | Type |
 
 ___
 
-###  _formatTimeFrames
+### `Private` _foldSpecialDayRanges
+
+▸ **_foldSpecialDayRanges**(`specialDays`: [SpecialDateTimeFrames](../interfaces/_types_.specialdatetimeframes.md)[]): *[FoldedSpecialDayRange](../interfaces/_types_.foldedspecialdayrange.md)[]*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`specialDays` | [SpecialDateTimeFrames](../interfaces/_types_.specialdatetimeframes.md)[] |
+
+**Returns:** *[FoldedSpecialDayRange](../interfaces/_types_.foldedspecialdayrange.md)[]*
+
+___
+
+### `Private` _formatTimeFrames
 
 ▸ **_formatTimeFrames**(`hours`: string[], `format`: string, `delimiter`: string, `placeholder`: string): *string*
 

@@ -21,3 +21,9 @@ test("test date is not a holiday", () => {
     expect(bh.isHoliday("2016-09-09")).toBe(false);
     expect(bh.hours.fri).toHaveLength(2);
 });
+
+test("invalid holidays throw", () => {
+    expect(() => {
+        new OpeningHours({ fri: ["10:00", "20:00"] }, "UTC", ["2000-10-10", "2015-09-09", "2020-02-31"]);
+    }).toThrow();
+});

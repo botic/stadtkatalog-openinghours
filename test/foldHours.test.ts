@@ -124,14 +124,9 @@ Dienstag: 08:00 bis 13:00 Uhr
 Mittwoch, Freitag: 08:00 bis 11:00 Uhr
 Donnerstag: 14:00 bis 19:00 Uhr
 Feiertags: geschlossen
-2018-08-23: geschlossen
-2018-08-24: geschlossen
-2018-08-27: geschlossen
-2018-08-28: geschlossen
-2018-08-29: geschlossen
-2018-09-19: geschlossen
-2018-09-20: geschlossen
-2018-09-21: geschlossen`);
+2018-08-23 – 2018-08-24: geschlossen
+2018-08-27 – 2018-08-29: geschlossen
+2018-09-19 – 2018-09-21: geschlossen`);
 
 expect(oh.fold({
     hyphen: " – ",
@@ -144,16 +139,38 @@ expect(oh.fold({
     closedPlaceholder: "geschlossen",
     specialDates: {
         format: "yyyy -- M .. dd",
-        from: new Date(2018, 7, 28),
-        to: new Date(2018, 8, 19),
+        from: new Date(2018, 0, 1),
+        to: new Date(2018, 12, 31),
     }
 })).toBe(`Montag: 09:00 bis 12:00 Uhr und 15:00 bis 19:00 Uhr
 Dienstag: 08:00 bis 13:00 Uhr
 Mittwoch, Freitag: 08:00 bis 11:00 Uhr
 Donnerstag: 14:00 bis 19:00 Uhr
 Feiertags: geschlossen
-2018 -- 8 .. 28: geschlossen
-2018 -- 8 .. 29: geschlossen
+2018 -- 8 .. 23 – 2018 -- 8 .. 24: geschlossen
+2018 -- 8 .. 27 – 2018 -- 8 .. 29: geschlossen
+2018 -- 9 .. 19 – 2018 -- 9 .. 21: geschlossen`);
+
+    expect(oh.fold({
+        hyphen: " – ",
+        delimiter: ", ",
+        timeFrameFormat: "{start} bis {end} Uhr",
+        timeFrameDelimiter: " und ",
+        locale: "de-AT",
+        holidayPrefix: "Feiertags",
+        weekdayFormat: WeekdayFormat.long,
+        closedPlaceholder: "geschlossen",
+        specialDates: {
+            format: "yyyy -- M .. dd",
+            from: new Date(2018, 7, 28),
+            to: new Date(2018, 8, 19),
+        }
+    })).toBe(`Montag: 09:00 bis 12:00 Uhr und 15:00 bis 19:00 Uhr
+Dienstag: 08:00 bis 13:00 Uhr
+Mittwoch, Freitag: 08:00 bis 11:00 Uhr
+Donnerstag: 14:00 bis 19:00 Uhr
+Feiertags: geschlossen
+2018 -- 8 .. 28 – 2018 -- 8 .. 29: geschlossen
 2018 -- 9 .. 19: geschlossen`);
 
     expect(oh.fold({
@@ -227,14 +244,9 @@ Feiertags: geschlossen`);
 Dienstag: 08:00 bis 13:00 Uhr
 Mittwoch, Freitag: 08:00 bis 11:00 Uhr
 Donnerstag: 14:00 bis 19:00 Uhr
-2018-08-23: geschlossen
-2018-08-24: geschlossen
-2018-08-27: geschlossen
-2018-08-28: geschlossen
-2018-08-29: geschlossen
-2018-09-19: geschlossen
-2018-09-20: geschlossen
-2018-09-21: geschlossen`);
+2018-08-23 – 2018-08-24: geschlossen
+2018-08-27 – 2018-08-29: geschlossen
+2018-09-19 – 2018-09-21: geschlossen`);
 });
 
 test("folds special days correctly", () => {
@@ -406,4 +418,66 @@ test("folds holidays correctly", () => {
 Feiertags: 12:00 bis 19:00 Uhr
 2099-01-01: 11:00 bis 12:00 Uhr
 2099-01-02: 14:00 bis 19:00 Uhr`);
+});
+
+test("throws an error", () => {
+    const ohSimple = new OpeningHours({
+        "2099-01-01": [
+            "13:00",
+            "20:00",
+        ],
+        "2099-01-02": [
+            "13:00",
+            "22:00",
+        ],
+    }, "UTC");
+    expect(() => {
+        ohSimple.fold({
+            hyphen: " – ",
+            delimiter: ", ",
+            timeFrameFormat: "{start} bis {end} Uhr",
+            timeFrameDelimiter: " und ",
+            locale: "de-AT",
+            holidayPrefix: undefined,
+            weekdayFormat: WeekdayFormat.long,
+        })
+    }).toThrow();
+});
+
+test("invalid special dates", () => {
+    expect(() => {
+        new OpeningHours({
+            "asdf": [
+                "13:00",
+                "20:00",
+            ],
+        }, "UTC");
+    }).toThrow();
+
+    expect(() => {
+        new OpeningHours({
+            "2020-02-30": [
+                "13:00",
+                "20:00",
+            ],
+            "2020-02-31": [
+                "13:00",
+                "22:00",
+            ],
+        }, "UTC");
+    }).toThrow();
+
+    let specialDatesWithUnknownHours = new OpeningHours({
+        "2020-02-01": undefined,
+        "2020-02-02": undefined,
+    }, "UTC");
+    expect(specialDatesWithUnknownHours.fold({
+            hyphen: " – ",
+            delimiter: ", ",
+            timeFrameFormat: "{start} bis {end} Uhr",
+            timeFrameDelimiter: " und ",
+            locale: "de-AT",
+            holidayPrefix: "Ferien",
+            weekdayFormat: WeekdayFormat.long,
+        })).toBe("");
 });

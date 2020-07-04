@@ -1,3 +1,5 @@
+import {DateTime} from "luxon";
+
 /**
  * StadtKatalog's object representation of opening hours.
  * Every property has an associated array with time frames. A time frame has a start and end string in the form
@@ -195,4 +197,20 @@ export interface RangeTimeSpan {
      * Opening hours for this range, e.g. `"09:00 – 18:00"`.
      */
     timespan: string;
+}
+
+/**
+ * Special date representation.
+ */
+export interface SpecialDateTimeFrames {
+    dt: DateTime;
+    timeFrames: string[];
+}
+
+/**
+ * A range between two special dates.
+ */
+export interface FoldedSpecialDayRange {
+    start: SpecialDateTimeFrames;
+    end: SpecialDateTimeFrames;
 }
