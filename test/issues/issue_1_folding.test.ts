@@ -46,7 +46,7 @@ test("issue 1", () => {
         closedPlaceholder: "Geschlossen",
         weekdayFormat: WeekdayFormat.long,
         specialDates: {
-            from: new Date(2020, 5, 0),
+            from: new Date(2020, 5, 1),
             format: "dd.MM.yyyy",
         },
     })).toBe(`Dienstag – Freitag: 11:00 bis 18:00 Uhr\nSamstag: 09:00 bis 17:00 Uhr\nFeiertags: Geschlossen\n29.06.2020 – 04.07.2020: Geschlossen`);
